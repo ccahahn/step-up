@@ -1,0 +1,91 @@
+/* ---- Step-ish palette: dark surface, vivid pink. Tune here. ---- */
+:root{
+  --bg:#0B0C0E; --card:#16181C; --card2:#1C1F24;
+  --ink:#FFFFFF; --mid:#9BA1AB; --dim:#6C737E; --rule:#262A31;
+  --acc:#FF4FA3; --acc-dim:#C9246F; --acc-soft:#FF9BC8;
+  --grad:linear-gradient(100deg,#FF7EC0 0%,#FF4FA3 45%,#E0198A 100%);
+  --glow:rgba(255,79,163,.15);
+  --warn:#FF6B5A;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+     font-size:16px;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+/* Added to Home Screen there is no browser chrome to inset below, so the
+   notch and the home indicator are ours to clear. In Safari the insets
+   are zero and this is plain 72/20/60. */
+.wrap{max-width:400px;margin:0 auto;
+      padding-top:calc(72px + env(safe-area-inset-top,0px));
+      padding-bottom:calc(60px + env(safe-area-inset-bottom,0px));
+      padding-left:calc(20px + env(safe-area-inset-left,0px));
+      padding-right:calc(20px + env(safe-area-inset-right,0px))}
+.hide{display:none}
+input{font:inherit;font-variant-numeric:tabular-nums;border:1px solid var(--rule);
+      border-radius:10px;background:var(--card);color:var(--ink);padding:13px;width:100%}
+input::placeholder{color:var(--dim)}
+input:focus{border-color:var(--acc-dim)}
+input:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+label{display:block;font-size:.78rem;color:var(--mid);margin-bottom:6px}
+.go{width:100%;padding:16px;border:0;border-radius:11px;background:var(--grad);color:#3A0A20;
+    font:inherit;font-weight:600;font-size:.98rem;cursor:pointer}
+.go:hover{filter:brightness(1.12)}
+.go:disabled{opacity:.55;cursor:default;filter:none}
+.back{background:none;border:0;font:inherit;font-size:.85rem;color:var(--mid);
+      padding:2px;cursor:pointer;margin-bottom:28px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:28px}
+.bar .back{margin-bottom:0}
+.copy{background:var(--card2);border:1px solid var(--rule);color:var(--mid);font:inherit;
+      font-size:.76rem;padding:7px 13px;border-radius:99px;cursor:pointer;white-space:nowrap}
+.copy:hover{color:var(--ink);border-color:var(--acc-dim)}
+.copy.done{color:var(--acc);border-color:transparent;background:var(--glow)}
+.back:hover{color:var(--ink)}
+
+/* ---------- home ---------- */
+.tally{margin:22px 0 0;padding-top:15px;border-top:1px solid var(--rule);
+       font-size:.79rem;color:var(--mid);line-height:1.7}
+.tally b{color:var(--ink);font-weight:500}
+.foot{margin-top:32px;padding-top:18px;border-top:1px solid var(--rule)}
+.foot button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:14px;
+             background:none;border:0;font:inherit;font-size:.88rem;color:var(--mid);
+             padding:9px 2px;cursor:pointer;text-align:left}
+.foot button:hover{color:var(--ink)}
+.lines{display:flex;flex-direction:column;gap:5px}
+.arw{color:var(--dim);font-size:1rem;flex:none}
+.quiet{font-size:.78rem;color:var(--dim);margin:16px 0 0}
+
+/* ---------- plan ---------- */
+form{display:grid;gap:17px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{font-size:.75rem;color:var(--dim);margin:6px 0 0;line-height:1.45}
+
+/* ---------- open ---------- */
+ul.open{list-style:none;margin:0;padding:0}
+ul.open li{border-bottom:1px solid var(--rule)}
+ul.open li:first-child{border-top:1px solid var(--rule)}
+.row{display:flex;align-items:baseline;gap:11px;width:100%;text-align:left;background:none;
+     border:0;font:inherit;color:inherit;padding:16px 2px;cursor:pointer}
+.row:hover .t{color:var(--acc)}
+.when{color:var(--dim);font-size:.77rem;width:42px;flex:none}
+.t{flex:1;font-size:.95rem;min-width:0}
+.t em{display:block;color:var(--acc-soft);font-size:.79rem;font-style:normal;margin-top:4px;line-height:1.45}
+.u{color:var(--dim);font-size:.87rem;white-space:nowrap}
+.u.paid{color:var(--acc)}
+.t .k{display:block;color:var(--acc);font-size:.79rem;font-style:normal;margin-top:4px}
+li.new{animation:lift 1.8s ease}
+@keyframes lift{0%,45%{background:var(--glow)}100%{background:transparent}}
+li.done .t em{color:var(--mid)}
+.panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .22s ease}
+li.open2 .panel{grid-template-rows:1fr}
+.panel>div{overflow:hidden}
+.inner{padding:4px 2px 20px;display:grid;gap:12px}
+.inner .go{padding:13px}
+.drop{justify-self:start;background:none;border:0;padding:2px;color:var(--dim);
+      font:inherit;font-size:.79rem;text-decoration:underline;cursor:pointer}
+.drop:hover{color:var(--warn)}
+
+/* ---------- storage trouble ---------- */
+.oops{margin:0 0 20px;padding:11px 13px;border:1px solid var(--acc-dim);border-radius:10px;
+      background:var(--glow);color:var(--acc-soft);font-size:.79rem;line-height:1.5}
+.oops button{background:none;border:0;font:inherit;color:var(--ink);text-decoration:underline;
+             padding:0;margin-left:6px;cursor:pointer}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

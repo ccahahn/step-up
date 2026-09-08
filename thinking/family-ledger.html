@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0B0C0E">
+<title>Kept</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ---- Step-ish palette: dark surface, vivid green. Tune here. ---- */
+  :root{
+    --bg:#0B0C0E; --card:#16181C; --card2:#1C1F24;
+    --ink:#FFFFFF; --mid:#9BA1AB; --dim:#6C737E; --rule:#262A31;
+    --acc:#FF4FA3; --acc-dim:#C9246F; --acc-soft:#FF9BC8;
+    --grad:linear-gradient(100deg,#FF7EC0 0%,#FF4FA3 45%,#E0198A 100%);
+    --glow:rgba(255,79,163,.15);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:"Instrument Sans",-apple-system,"Segoe UI",Roboto,sans-serif;
+       font-size:16px;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:400px;margin:0 auto;padding:44px 20px 60px}
+  .hide{display:none}
+  input{font:inherit;font-variant-numeric:tabular-nums;border:1px solid var(--rule);
+        border-radius:10px;background:var(--card);color:var(--ink);padding:13px;width:100%}
+  input::placeholder{color:var(--dim)}
+  input:focus{border-color:var(--acc-dim)}
+  input:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  label{display:block;font-size:.78rem;color:var(--mid);margin-bottom:6px}
+  .go{width:100%;padding:16px;border:0;border-radius:11px;background:var(--grad);color:#3A0A20;
+      font:inherit;font-weight:600;font-size:.98rem;cursor:pointer}
+  .go:hover{filter:brightness(1.12)}
+  .back{background:none;border:0;font:inherit;font-size:.85rem;color:var(--mid);
+        padding:2px;cursor:pointer;margin-bottom:28px}
+  .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:28px}
+  .bar .back{margin-bottom:0}
+  .copy{background:var(--card2);border:1px solid var(--rule);color:var(--mid);font:inherit;
+        font-size:.76rem;padding:7px 13px;border-radius:99px;cursor:pointer;white-space:nowrap}
+  .copy:hover{color:var(--ink);border-color:var(--acc-dim)}
+  .copy.done{color:var(--acc);border-color:transparent;background:var(--glow)}
+  .back:hover{color:var(--ink)}
+
+  /* ---------- home ---------- */
+  .tally{margin:22px 0 0;padding-top:15px;border-top:1px solid var(--rule);
+         font-size:.79rem;color:var(--mid);line-height:1.7}
+  .tally b{color:var(--ink);font-weight:500}
+  .foot{margin-top:32px;padding-top:18px;border-top:1px solid var(--rule)}
+  .foot button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:14px;
+               background:none;border:0;font:inherit;font-size:.88rem;color:var(--mid);
+               padding:9px 2px;cursor:pointer;text-align:left}
+  .foot button:hover{color:var(--ink)}
+  .lines{display:flex;flex-direction:column;gap:5px}
+  .arw{color:var(--dim);font-size:1rem;flex:none}
+  .quiet{font-size:.78rem;color:var(--dim);margin:16px 0 0}
+
+  /* ---------- plan ---------- */
+  form{display:grid;gap:17px}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .hint{font-size:.75rem;color:var(--dim);margin:6px 0 0;line-height:1.45}
+
+  /* ---------- open ---------- */
+  ul.open{list-style:none;margin:0;padding:0}
+  ul.open li{border-bottom:1px solid var(--rule)}
+  ul.open li:first-child{border-top:1px solid var(--rule)}
+  .row{display:flex;align-items:baseline;gap:11px;width:100%;text-align:left;background:none;
+       border:0;font:inherit;color:inherit;padding:16px 2px;cursor:pointer}
+  .row:hover .t{color:var(--acc)}
+  .when{color:var(--dim);font-size:.77rem;width:42px;flex:none}
+  .t{flex:1;font-size:.95rem;min-width:0}
+  .t em{display:block;color:var(--acc-soft);font-size:.79rem;font-style:normal;margin-top:4px;line-height:1.45}
+  .u{color:var(--dim);font-size:.87rem;white-space:nowrap}
+  .u.paid{color:var(--acc)}
+  .t .k{display:block;color:var(--acc);font-size:.79rem;font-style:normal;margin-top:4px}
+  li.new{animation:lift 1.8s ease}
+  @keyframes lift{0%,45%{background:var(--glow)}100%{background:transparent}}
+  li.done .t em{color:var(--mid)}
+  .panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .22s ease}
+  li.open2 .panel{grid-template-rows:1fr}
+  .panel>div{overflow:hidden}
+  .inner{padding:4px 2px 20px;display:grid;gap:12px}
+  .inner .go{padding:13px}
+  .drop{justify-self:start;background:none;border:0;padding:2px;color:var(--dim);
+        font:inherit;font-size:.79rem;text-decoration:underline;cursor:pointer}
+  .drop:hover{color:#FF6B5A}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ================= HOME ================= -->
+<section id="vHome">
+  <button class="go" id="planBtn">Plan something</button>
+
+  <div class="foot" id="foot">
+    <button id="openBtn" type="button">
+      <span class="lines" id="lines"></span>
+      <span class="arw">&#8594;</span>
+    </button>
+  </div>
+</section>
+
+<!-- ================= PLAN ================= -->
+<section id="vPlan" class="hide">
+  <button class="back" type="button" data-home>&#8592; Back</button>
+  <form id="f">
+    <div>
+      <label for="fWhat">What's coming up?</label>
+      <input type="text" id="fWhat" placeholder="Threading" required>
+    </div>
+    <div class="pair">
+      <div>
+        <label for="fUsual">What it usually costs</label>
+        <input type="text" inputmode="decimal" class="money" id="fUsual" placeholder="$0" required>
+      </div>
+      <div>
+        <label for="fDate">When</label>
+        <input type="date" id="fDate" required>
+      </div>
+    </div>
+    <div>
+      <label for="fMove">Instead, I could…</label>
+      <input type="text" id="fMove" placeholder="do it at home">
+      <p class="hint">You are not committing to this. Just think about it.</p>
+    </div>
+    <button class="go" type="submit">Plan it</button>
+  </form>
+</section>
+
+<!-- ================= OPEN ================= -->
+<section id="vOpen" class="hide">
+  <div class="bar">
+    <button class="back" type="button" data-home>&#8592; Back</button>
+    <button class="copy" type="button" id="copyBtn">Copy for spreadsheet</button>
+  </div>
+  <ul class="open" id="list"></ul>
+  <p class="tally hide" id="tally"></p>
+  <p class="quiet hide" id="quiet"></p>
+</section>
+
+</div>
+
+<script>
+const KEY='kept-v3';
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){}};
+let items=(()=>{try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}})()||[
+  {id:1,date:'2026-09-07',what:'Threading',usual:50,spent:null,move:'do it at home',who:''},
+  {id:2,date:'2026-09-10',what:'Eat with Supriya',usual:80,spent:null,move:'coffee instead of dinner',who:''},
+  {id:3,date:'2026-09-11',what:'Snacks for girls',usual:50,spent:null,move:'fruit and pancakes at home',who:''},
+  {id:4,date:'2026-09-02',what:'Coffee run before practice',usual:24,spent:9,move:'fill the thermos at home',who:''}
+];
+items.forEach(i=>{i.move=(i.move||'').trim()});
+let opened=null, justWon=null;
+
+const $=id=>document.getElementById(id);
+const m=n=>'$'+(+n).toFixed(2).replace(/\.00$/,'');
+const raw=el=>el.value.replace(/[^0-9.]/g,'');
+const num=el=>parseFloat(raw(el))||0;
+document.addEventListener('input',e=>{
+  const el=e.target.closest('.money'); if(!el)return;
+  let v=raw(el), p=v.split('.');
+  if(p.length>1)v=p[0]+'.'+p.slice(1).join('').slice(0,2);
+  el.value=v===''?'':'$'+v;
+});
+const isOpen=i=>i.spent==null||isNaN(i.spent);
+const saved=i=>Math.max(0,i.usual-i.spent);
+
+function show(v){
+  for(const [k,el] of [['home',$('vHome')],['plan',$('vPlan')],['open',$('vOpen')]])
+    el.classList.toggle('hide',k!==v);
+  if(v==='home')home(); if(v==='open')list();
+  scrollTo(0,0);
+}
+
+/* ---------- home: the action, and the two counts ---------- */
+function home(){
+  const op=items.filter(isOpen), sh=items.filter(i=>!isOpen(i));
+  const owed=op.reduce((s,i)=>s+(+i.usual||0),0);
+  const paid=sh.reduce((s,i)=>s+(+i.spent||0),0);
+  const lines=[];
+  if(op.length)lines.push(`${op.length} planned, ${m(owed)}`);
+  if(sh.length)lines.push(`${sh.length} closed, ${m(paid)}`);
+  $('lines').innerHTML=lines.map(l=>`<span>${l}</span>`).join('');
+  $('openBtn').disabled=!lines.length;
+  $('foot').classList.toggle('hide',!lines.length);
+}
+
+/* ---------- the list: everything lives here ---------- */
+function list(){
+  const rows=[...items.filter(isOpen).sort((a,b)=>a.date.localeCompare(b.date)),
+              ...items.filter(i=>!isOpen(i)).sort((a,b)=>a.date.localeCompare(b.date))];
+  const L=$('list'); L.innerHTML='';
+  for(const it of rows){
+    const [y,mo,d]=it.date.split('-');
+    const when=new Date(+y,+mo-1,+d).toLocaleString('en-US',{month:'short',day:'numeric'});
+    const shut=!isOpen(it), kept=shut?saved(it):0;
+    const li=document.createElement('li');
+    li.className=[opened===it.id?'open2':'',shut?'done':'',justWon===it.id?'new':''].join(' ').trim();
+    li.innerHTML=`
+      <button class="row" data-o="${it.id}" aria-expanded="${opened===it.id}">
+        <span class="when">${when}</span><span class="t"></span>
+        <span class="u ${shut?'paid':''}">${shut?m(it.spent):m(it.usual)+' usual'}</span>
+      </button>
+      <div class="panel"><div><div class="inner">
+        <div>
+          <label>What did it actually cost?</label>
+          <input type="text" inputmode="decimal" class="money" placeholder="$0"
+                 value="${shut?m(it.spent):''}" data-s="${it.id}">
+        </div>
+        ${shut?`<div>
+          <label>Who?</label>
+          <input type="text" data-who="${it.id}" placeholder="Optional">
+        </div>`:''}
+        <button class="go" data-close="${it.id}">${shut?'Update':'Close it out'}</button>
+        <button class="drop" data-del="${it.id}">${shut?'Remove':"Didn't happen — remove"}</button>
+      </div></div></div>`;
+    const t=li.querySelector('.t'); t.textContent=it.what;
+    const mv=(it.move||'').trim();
+    if(mv){const e=document.createElement('em');e.textContent='Instead, I could '+mv;t.appendChild(e)}
+    if(kept>0){const k=document.createElement('em');k.className='k';
+               k.textContent=`+${m(kept)} saved`+(it.who?` · ${it.who}`:'');t.appendChild(k)}
+    const w=li.querySelector('[data-who]'); if(w)w.value=it.who||'';
+    L.appendChild(li);
+  }
+  justWon=null;
+
+  /* retro tally, at the bottom where the closed ones are */
+  const by={};
+  for(const i of items.filter(i=>!isOpen(i)&&saved(i)>0))
+    by[(i.who||'').trim()||'—']=(by[(i.who||'').trim()||'—']||0)+saved(i);
+  const names=Object.keys(by).filter(k=>k!=='—');
+  $('tally').classList.toggle('hide',!names.length);
+  if(names.length){
+    const parts=names.sort((a,b)=>by[b]-by[a]).map(n=>`<b>${n}</b> ${m(by[n])}`);
+    if(by['—'])parts.push(`unassigned ${m(by['—'])}`);
+    $('tally').innerHTML='Who kept what &middot; '+parts.join(' &nbsp;·&nbsp; ');
+  }
+
+  $('copyBtn').classList.toggle('hide',!items.length);
+  const flat=items.filter(i=>!isOpen(i)&&saved(i)<=0).length;
+  $('quiet').textContent=flat?`${flat} closed at or above usual.`:'';
+  $('quiet').classList.toggle('hide',!flat);
+}
+
+$('planBtn').onclick=()=>{show('plan');$('fWhat').focus()};
+$('openBtn').onclick=()=>show('open');
+document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{opened=null;show('home')});
+
+$('f').onsubmit=e=>{
+  e.preventDefault();
+  items.push({id:Date.now(),date:$('fDate').value,what:$('fWhat').value.trim(),
+              usual:num($('fUsual')),spent:null,move:$('fMove').value.trim(),who:''});
+  save();
+  $('fWhat').value='';$('fUsual').value='';$('fMove').value='';
+  $('fDate').value=new Date().toISOString().slice(0,10);
+  show('home');
+};
+
+$('list').addEventListener('click',e=>{
+  const o=e.target.closest('[data-o]'),c=e.target.closest('[data-close]'),d=e.target.closest('[data-del]');
+  if(d){items=items.filter(x=>x.id!=d.dataset.del);opened=null;save();list();return}
+  if(c){
+    const it=items.find(x=>x.id==c.dataset.close);
+    const inp=document.querySelector(`[data-s="${it.id}"]`);
+    if(!raw(inp)){inp.focus();return}
+    it.spent=num(inp); save(); opened=null;
+    justWon=saved(it)>0?it.id:null;
+    list(); return;
+  }
+  if(o){opened=opened==o.dataset.o?null:+o.dataset.o;list();
+        const f=document.querySelector('li.open2 [data-s]');if(f)f.focus();}
+});
+
+$('list').addEventListener('input',e=>{
+  const w=e.target.closest('[data-who]'); if(!w)return;
+  items.find(x=>x.id==w.dataset.who).who=w.value.trim(); save();
+});
+
+/* ---------- copy the running list as spreadsheet columns ---------- */
+const cell=v=>String(v??'').replace(/[\t\r\n]+/g,' ').trim();
+function tsv(){
+  const head=['Date','What','Usual','Actual','Saved','Instead I could','Who','Status'];
+  const rows=items.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(i=>{
+    const shut=!isOpen(i);
+    return [i.date,cell(i.what),i.usual,shut?i.spent:'',shut?saved(i):'',
+            cell(i.move),cell(i.who),shut?'closed':'planned'].join('\t');
+  });
+  return [head.join('\t'),...rows].join('\n');
+}
+$('copyBtn').onclick=async()=>{
+  const text=tsv(), b=$('copyBtn');
+  try{ await navigator.clipboard.writeText(text); }
+  catch(e){
+    const ta=document.createElement('textarea');
+    ta.value=text; ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try{document.execCommand('copy')}catch(_){}
+    ta.remove();
+  }
+  b.textContent='Copied'; b.classList.add('done');
+  setTimeout(()=>{b.textContent='Copy for spreadsheet';b.classList.remove('done')},1600);
+};
+
+$('fDate').value=new Date().toISOString().slice(0,10);
+show('home');
+</script>
+</body>
+</html>
