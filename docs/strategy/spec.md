@@ -61,8 +61,11 @@ Nothing else animates.
 
 *Put a name on it*
 
-Only once something is closed does the app ask "Who?". The tally at the bottom —
-"Who kept what · Cecilia $47.50" — appears only after at least one person is
+Only once something is closed does the app ask "Who?", and it asks with the
+family's names as buttons rather than a text field — one tap, on a phone, with
+one free-typed slot for a guest. Several people can be credited on the same
+saving, which then splits between them. The tally at the bottom — "Who kept
+what · Papa $23.75 · Izzy $23.75" — appears only after at least one person is
 named; money nobody claims shows as "unassigned" beside them and never on its
 own. Credit is opt-in, and the ledger is made of people or it isn't shown.
 

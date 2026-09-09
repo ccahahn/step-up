@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import MoneyInput from "./MoneyInput";
+import WhoPicker from "./WhoPicker";
 import { lowerFirst, m, numMoney, rawMoney, when } from "@/lib/format";
+import { formatWho, parseWho } from "@/lib/people";
 import { isOpen, saved, type Item } from "@/lib/types";
 
 export default function Row({
@@ -26,7 +28,7 @@ export default function Row({
   const kept = shut ? saved(item) : 0;
 
   const [spent, setSpent] = useState(shut ? m(item.spent!) : "");
-  const [who, setWho] = useState(item.who ?? "");
+  const [who, setWho] = useState<string[]>(parseWho(item.who ?? ""));
   const spentRef = useRef<HTMLInputElement>(null);
 
   // The panel is open — put the cursor where the one number goes.
@@ -75,17 +77,14 @@ export default function Row({
 
             {shut && (
               <div>
-                <label htmlFor={`w-${item.id}`}>Who?</label>
-                <input
-                  id={`w-${item.id}`}
-                  type="text"
-                  placeholder="Optional"
+                <label>Who?</label>
+                <WhoPicker
                   value={who}
-                  onChange={(e) => {
+                  onChange={(names) => {
                     // Live, not on blur: the tally at the bottom of the list
-                    // counts up as you type your name. That is the payoff.
-                    setWho(e.target.value);
-                    onWho(e.target.value);
+                    // moves as you tap. That is the payoff.
+                    setWho(names);
+                    onWho(formatWho(names));
                   }}
                 />
               </div>

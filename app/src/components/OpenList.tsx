@@ -4,6 +4,7 @@ import { useState } from "react";
 import Row from "./Row";
 import { m } from "@/lib/format";
 import { isOpen, saved, type Item } from "@/lib/types";
+import { parseWho } from "@/lib/people";
 
 const cell = (v: unknown) => String(v ?? "").replace(/[\t\r\n]+/g, " ").trim();
 
@@ -88,11 +89,18 @@ export default function OpenList({
     ...items.filter((i) => !isOpen(i)).sort(byDate),
   ];
 
-  // Who kept what — only counts rows that came in under.
+  // Who kept what — only counts rows that came in under. Several people can
+  // be credited on one row; the saving splits between them so the tally still
+  // adds up to what the family actually kept.
   const by: Record<string, number> = {};
   for (const i of items.filter((i) => !isOpen(i) && saved(i) > 0)) {
-    const k = (i.who || "").trim() || "—";
-    by[k] = (by[k] || 0) + saved(i);
+    const names = parseWho(i.who || "");
+    if (names.length === 0) {
+      by["—"] = (by["—"] || 0) + saved(i);
+      continue;
+    }
+    const share = saved(i) / names.length;
+    for (const n of names) by[n] = (by[n] || 0) + share;
   }
   const names = Object.keys(by).filter((k) => k !== "—");
 

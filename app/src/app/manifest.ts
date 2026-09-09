@@ -12,8 +12,13 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#0B0C0E",
     theme_color: "#0B0C0E",
     icons: [
-      { src: "/icon.png", sizes: "512x512", type: "image/png" },
-      { src: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+      // Without a maskable entry Android treats the icon as legacy art: it
+      // shrinks it and mounts it on a white circular plate. Declaring maskable
+      // lets the launcher crop our own black field to whatever shape it uses.
+      // The art already suits both — full-bleed black, lotus well inside the
+      // centre 80% safe zone.
+      { src: "/icon.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icon.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
   };
 }

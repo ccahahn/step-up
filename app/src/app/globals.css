@@ -82,6 +82,17 @@ li.open2 .panel{grid-template-rows:1fr}
       font:inherit;font-size:.79rem;text-decoration:underline;cursor:pointer}
 .drop:hover{color:var(--warn)}
 
+/* ---------- who kept it ---------- */
+.who{display:grid;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--card2);border:1px solid var(--rule);color:var(--mid);font:inherit;
+      font-size:.84rem;padding:9px 15px;border-radius:99px;cursor:pointer;
+      transition:color .12s ease,border-color .12s ease}
+.chip:hover{color:var(--ink);border-color:var(--acc-dim)}
+.chip.on{background:var(--grad);border-color:transparent;color:#3A0A20;font-weight:600}
+.chip.on:hover{filter:brightness(1.12)}
+.who .other{padding:11px 13px}
+
 /* ---------- storage trouble ---------- */
 .oops{margin:0 0 20px;padding:11px 13px;border:1px solid var(--acc-dim);border-radius:10px;
       background:var(--glow);color:var(--acc-soft);font-size:.79rem;line-height:1.5}

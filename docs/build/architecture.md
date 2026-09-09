@@ -47,10 +47,12 @@ app/
     Plan.tsx          the four-field form
     OpenList.tsx      the list, the who-kept-what tally, the TSV export
     Row.tsx           one item and its accordion panel
+    WhoPicker.tsx     tap-to-credit chips, plus one free-typed name
     MoneyInput.tsx    masks to "$12.50" as you type
   src/lib/
     store.ts          the only file that touches storage
     types.ts          Item, isOpen(), saved()
+    people.ts         the family list, and packing several names into `who`
     format.ts         money, dates, the input mask, lowerFirst()
 data/
   schema.sql          run once in the Neon SQL editor
@@ -103,10 +105,10 @@ second phone picks up what the first one did — skips while anything is in
 flight, because refetching mid-write would hand back the pre-write rows and
 visibly undo what you just tapped.
 
-The `who` field is the exception: it saves on every keystroke, debounced 500ms
+The `who` field is the exception: it saves as you tap or type, debounced 500ms
 per row, and does not roll back on failure. The tally at the bottom of the list
-counting up as you type your name is the payoff, and yanking a half-typed name
-out from under someone is worse than a stale write. The banner covers it.
+moving as you credit someone is the payoff, and yanking a half-typed name out
+from under someone is worse than a stale write. The banner covers it.
 
 ## Installed, not bookmarked
 
@@ -128,6 +130,29 @@ Icons come from `data/mobile-icon.png` through `data/make-icons.py`. The source
 is a rounded black square on white; iOS masks with its own squircle, so the
 script crops to the artwork and repaints the leftover corners black. Shipping
 the source as-is gives a white frame around a double-rounded square.
+
+The manifest declares the same file twice, `purpose: "any"` and `purpose:
+"maskable"`. Without the maskable entry Android treats it as legacy art —
+shrinking it and mounting it on a white circular plate — instead of cropping
+our own black field to the launcher's shape. The art suits both because it is
+full-bleed black with the lotus at 63% of the width, well inside the centre 80%
+that a mask is guaranteed to keep.
+
+## Who kept it
+
+`who` is still one text column holding several names comma-separated, so the
+picker needed no migration against the deployed database. The cost is that a
+name cannot contain a comma; `WhoPicker` strips them on the way in, and
+`parseWho` tolerates the stray spaces and empty segments that follow.
+
+The presets in `people.ts` are the whole family, and Other is a single
+free-typed slot rather than a second list — the guest case, not a second
+family. An older single name like `Cecilia` parses as one custom name, so rows
+written before the picker existed still open correctly.
+
+A saving credited to two people splits between them in the tally. Crediting
+both the full amount would make "Who kept what" add up to more than the family
+actually kept, and the tally's whole job is to decompose that number.
 
 ## Flow
 
