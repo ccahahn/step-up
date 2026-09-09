@@ -11,6 +11,7 @@ import {
   removeItemAction,
   setWhoAction,
 } from "@/app/actions";
+import type { Result } from "@/app/actions";
 import { saved, type Item } from "@/lib/types";
 
 type View = "home" | "plan" | "open";
@@ -18,15 +19,17 @@ type View = "home" | "plan" | "open";
 export default function StepUp({
   initial,
   shared,
+  initialError = null,
 }: {
   initial: Item[];
   shared: boolean;
+  initialError?: string | null;
 }) {
   const [items, setItems] = useState<Item[]>(initial);
   const [view, setView] = useState<View>("home");
   const [opened, setOpened] = useState<string | null>(null);
   const [justWon, setJustWon] = useState<string | null>(null);
-  const [problem, setProblem] = useState(false);
+  const [problem, setProblem] = useState<string | null>(initialError);
 
   // Number of writes in flight. A refresh while one is pending would hand back
   // the pre-write rows and undo what you just did on screen.
@@ -43,15 +46,19 @@ export default function StepUp({
 
   /** Paint the change now, persist behind it, put it back if the write fails. */
   const persist = useCallback(
-    (next: Item[], write: () => Promise<void>) => {
+    (next: Item[], write: () => Promise<Result>) => {
       const before = items;
       setItems(next);
       inFlight.current += 1;
       write()
-        .then(() => setProblem(false))
-        .catch(() => {
+        .then((r) => {
+          if (r.ok) return setProblem(null);
           setItems(before);
-          setProblem(true);
+          setProblem(r.error);
+        })
+        .catch((e) => {
+          setItems(before);
+          setProblem(e instanceof Error ? e.message : String(e));
         })
         .finally(() => {
           inFlight.current -= 1;
@@ -63,10 +70,12 @@ export default function StepUp({
   const reload = useCallback(async () => {
     if (inFlight.current > 0) return;
     try {
-      setItems(await refreshAction());
-      setProblem(false);
-    } catch {
-      setProblem(true);
+      const r = await refreshAction();
+      if (!r.ok) return setProblem(r.error);
+      setItems(r.items);
+      setProblem(null);
+    } catch (e) {
+      setProblem(e instanceof Error ? e.message : String(e));
     }
   }, []);
 
@@ -128,8 +137,8 @@ export default function StepUp({
       setTimeout(() => {
         timers.delete(id);
         setWhoAction(id, who)
-          .then(() => setProblem(false))
-          .catch(() => setProblem(true))
+          .then((r) => setProblem(r.ok ? null : r.error))
+          .catch((e) => setProblem(e instanceof Error ? e.message : String(e)))
           .finally(() => {
             inFlight.current -= 1;
           });
@@ -150,6 +159,7 @@ export default function StepUp({
       {problem && (
         <p className="oops">
           That didn&rsquo;t save — the list on screen may be behind.
+          <span className="why">{problem}</span>
           <button type="button" onClick={reload}>
             Try again
           </button>

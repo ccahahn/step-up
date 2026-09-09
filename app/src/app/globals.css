@@ -87,5 +87,6 @@ li.open2 .panel{grid-template-rows:1fr}
       background:var(--glow);color:var(--acc-soft);font-size:.79rem;line-height:1.5}
 .oops button{background:none;border:0;font:inherit;color:var(--ink);text-decoration:underline;
              padding:0;margin-left:6px;cursor:pointer}
+.oops .why{display:block;margin:6px 0 2px;color:var(--mid);font-size:.74rem;line-height:1.45}
 
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

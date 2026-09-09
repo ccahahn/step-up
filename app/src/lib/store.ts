@@ -6,14 +6,29 @@ import type { Item } from "./types";
 
 // The only file that touches storage. Neon Postgres when DATABASE_URL is set,
 // otherwise a JSON file so `npm run dev` works with nothing configured.
-// The file path is dev-only — Vercel's filesystem is read-only at runtime.
 
 const url = process.env.DATABASE_URL;
+const isProd = process.env.NODE_ENV === "production";
 export const usingDatabase = Boolean(url);
 
 const db = () => neon(url!);
 
 const LOCAL = path.join(process.cwd(), "..", "data", "local.json");
+
+/**
+ * The JSON file is a dev convenience and nothing else. A deployment whose
+ * DATABASE_URL never arrived would otherwise fall through to it, read an empty
+ * list from a file that isn't there, and fail every write against a read-only
+ * filesystem — looking like a database problem when it is a config problem.
+ */
+function assertLocalAllowed(): void {
+  if (isProd)
+    throw new Error(
+      "DATABASE_URL is not set, so the app has no database. Add it under " +
+        "Settings → Environment Variables and redeploy — env vars added after " +
+        "a deployment do not reach it until you redeploy.",
+    );
+}
 
 async function readLocal(): Promise<Item[]> {
   try {
@@ -43,7 +58,10 @@ function toItem(r: Record<string, unknown>): Item {
 }
 
 export async function listItems(): Promise<Item[]> {
-  if (!usingDatabase) return readLocal();
+  if (!usingDatabase) {
+    assertLocalAllowed();
+    return readLocal();
+  }
   const sql = db();
   // to_char, not the raw date column: the driver would hand back a JS Date in
   // the server's zone and "2026-09-07" could arrive as the 6th.
@@ -61,6 +79,7 @@ export async function listItems(): Promise<Item[]> {
 /** The id is minted on the client so the row can appear before the round trip. */
 export async function addItem(row: Omit<Item, "created_at">): Promise<void> {
   if (!usingDatabase) {
+    assertLocalAllowed();
     const rows = await readLocal();
     rows.push({ ...row, created_at: new Date().toISOString() });
     return writeLocal(rows);
@@ -76,6 +95,7 @@ export async function addItem(row: Omit<Item, "created_at">): Promise<void> {
 
 export async function setSpent(id: string, spent: number): Promise<void> {
   if (!usingDatabase) {
+    assertLocalAllowed();
     const rows = await readLocal();
     const row = rows.find((r) => r.id === id);
     if (row) row.spent = spent;
@@ -87,6 +107,7 @@ export async function setSpent(id: string, spent: number): Promise<void> {
 
 export async function setWho(id: string, who: string): Promise<void> {
   if (!usingDatabase) {
+    assertLocalAllowed();
     const rows = await readLocal();
     const row = rows.find((r) => r.id === id);
     if (row) row.who = who;
@@ -98,6 +119,7 @@ export async function setWho(id: string, who: string): Promise<void> {
 
 export async function removeItem(id: string): Promise<void> {
   if (!usingDatabase) {
+    assertLocalAllowed();
     const rows = await readLocal();
     return writeLocal(rows.filter((r) => r.id !== id));
   }
