@@ -74,7 +74,7 @@ export default function Row({
         <span className="when">{when(item.date)}</span>
         <span className="t">
           {item.what}
-          {item.move.trim() && <em>I could {lowerFirst(item.move.trim())}</em>}
+          {item.move.trim() && <em>Maybe {lowerFirst(item.move.trim())}</em>}
           {kept > 0 && (
             <em className="k">
               +{m(kept)} saved
@@ -104,7 +104,7 @@ export default function Row({
             </div>
 
             <div>
-              <label htmlFor={`m-${item.id}`}>Instead, I could&hellip;</label>
+              <label htmlFor={`m-${item.id}`}>Maybe, I could&hellip;</label>
               <input
                 id={`m-${item.id}`}
                 type="text"

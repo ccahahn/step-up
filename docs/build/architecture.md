@@ -12,7 +12,7 @@ from it; its `localStorage` was a prototype's convenience, not a decision.
 ## Palette
 
 Dark surface, one vivid pink. `--bg #0B0C0E`, cards `#16181C`, rules
-`#262A31`, accent `#FF4FA3` with a soft `#FF9BC8` for the "I could" line and a
+`#262A31`, accent `#FF4FA3` with a soft `#FF9BC8` for the "Maybe" line and a
 gradient for the primary buttons. Defined once as CSS variables at the top of
 `globals.css`.
 
@@ -192,7 +192,7 @@ The tally is for wins, and a win that can be cancelled out by a loss elsewhere
 stops being motivating.
 
 `lowerFirst()` lowercases the alternative on render so "Buy a pint" joins
-"I could …" as one sentence. It skips all-caps first words, so "DIY it at home"
+"Maybe …" as one sentence. It skips all-caps first words, so "DIY it at home"
 survives. Display only — the stored text and the TSV export keep what was typed.
 
 The clipboard write races a 500ms timeout before falling back to

@@ -38,7 +38,7 @@ export function numMoney(v: string): number {
 }
 
 /**
- * "Buy a pint" -> "buy a pint", so the alternative joins "I could …" as one
+ * "Buy a pint" -> "buy a pint", so the alternative joins "Maybe …" as one
  * sentence however it was typed. Acronyms are left alone: "DIY it at home"
  * would otherwise become "dIY it at home".
  *

@@ -54,5 +54,5 @@ image and re-run the crop-and-resize in `data/README.md`.
 ## Exporting
 
 "Copy for spreadsheet" on the list puts every row on the clipboard as
-tab-separated columns — Date, What, Usual, Actual, Saved, Instead I could,
+tab-separated columns — Date, What, Usual, Actual, Saved, Maybe I could,
 Who, Status. Paste straight into Sheets or Excel.

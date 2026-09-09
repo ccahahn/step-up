@@ -12,7 +12,7 @@ const cell = (v: unknown) => String(v ?? "").replace(/[\t\r\n]+/g, " ").trim();
 function tsv(items: Item[]): string {
   const head = [
     "Date", "What", "Usual", "Actual", "Saved",
-    "Instead I could", "Who", "Status",
+    "Maybe I could", "Who", "Status",
   ];
   const rows = items
     .slice()

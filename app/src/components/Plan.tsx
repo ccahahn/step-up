@@ -73,7 +73,7 @@ export default function Plan({
         </div>
 
         <div>
-          <label htmlFor="fMove">Instead, I could&hellip;</label>
+          <label htmlFor="fMove">Maybe, I could&hellip;</label>
           <input
             id="fMove"
             type="text"

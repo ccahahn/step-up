@@ -8,7 +8,7 @@ export type Item = {
   usual: number;
   /** null while it is still planned. A number means it is closed out. */
   spent: number | null;
-  /** "Instead, I could do it at home" — the alternative, not a commitment. */
+  /** "Maybe, I could do it at home" — the alternative, not a commitment. */
   move: string;
   /** Who kept the difference. */
   who: string;

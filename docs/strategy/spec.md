@@ -46,7 +46,7 @@ Inputs
 
 *Plan it, and write down the other option*
 
-Four fields: what's coming up, what it usually costs, when, and "Instead, I
+Four fields: what's coming up, what it usually costs, when, and "Maybe, I
 could…". The fourth is the product; the first three exist to give it something
 to hang on. It is optional, and the form says underneath it, "You are not
 committing to this. Just think about it." A promise is the thing people avoid
