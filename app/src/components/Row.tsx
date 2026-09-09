@@ -30,11 +30,36 @@ export default function Row({
   const [spent, setSpent] = useState(shut ? m(item.spent!) : "");
   const [who, setWho] = useState<string[]>(parseWho(item.who ?? ""));
   const spentRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
-  // The panel is open — put the cursor where the one number goes.
   useEffect(() => {
-    if (opened) spentRef.current?.focus();
-  }, [opened]);
+    if (!opened) return;
+
+    // Only chase the amount on a row that has not been closed out yet — that
+    // is the one thing you came to type. Reopening a closed row is usually
+    // about Who, and raising the keyboard there would bury the chips.
+    if (!shut) spentRef.current?.focus({ preventScroll: true });
+
+    // A row low in the list opens its panel below the fold, and nothing scrolls
+    // it into view on its own. Timing this against the expand animation is not
+    // possible by listening for it: grid-template-rows animates without ever
+    // firing transitionend. So watch the panel's box instead and keep it in
+    // view as it grows — no dependency on the duration in globals.css.
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    const follow = () => panel.scrollIntoView({ block: "nearest" });
+    follow();
+
+    const ro = new ResizeObserver(follow);
+    ro.observe(panel);
+    // Long enough to cover the expand, short enough not to fight the reader.
+    const stop = setTimeout(() => ro.disconnect(), 500);
+    return () => {
+      ro.disconnect();
+      clearTimeout(stop);
+    };
+  }, [opened, shut]);
 
   const cls = [opened ? "open2" : "", shut ? "done" : "", justWon ? "new" : ""]
     .join(" ")
@@ -61,7 +86,7 @@ export default function Row({
 
       {/* Always in the DOM so the row can animate open; inert keeps the
           collapsed fields out of the tab order. */}
-      <div className="panel" inert={!opened}>
+      <div className="panel" ref={panelRef} inert={!opened}>
         <div>
           <div className="inner">
             <div>

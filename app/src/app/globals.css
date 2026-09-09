@@ -76,6 +76,7 @@ li.done .t em{color:var(--mid)}
 .panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .22s ease}
 li.open2 .panel{grid-template-rows:1fr}
 .panel>div{overflow:hidden}
+.panel{scroll-margin-block:14px}
 .inner{padding:4px 2px 20px;display:grid;gap:12px}
 .inner .go{padding:13px}
 .drop{justify-self:start;background:none;border:0;padding:2px;color:var(--dim);
