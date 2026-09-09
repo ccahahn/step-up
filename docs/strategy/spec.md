@@ -83,9 +83,11 @@ hands the problem to Sheets.
   shared list, a family.
 - Budgets, categories, charts, trends, and any grand total of savings. The named
   tally is the whole scoreboard.
-- Editing a plan after you make it. What, how much, when, and the alternative are
-  fixed at creation; only the outcome is recordable. A plan that was wrong gets
-  removed — "Didn't happen — remove" — not corrected.
+- Editing what a plan cost or when it was. `usual` and the date are fixed at
+  creation, because `usual` defines the saving and editing it after the fact
+  would let you manufacture one. The alternative is editable — a plan that
+  never named one could otherwise never get one, and thinking of a better swap
+  later is the behaviour we want, not a correction.
 - Due dates, reminders, overdue states. An item whose date has passed looks
   exactly like one next week. The app never nags; it is opened on purpose or not
   at all.

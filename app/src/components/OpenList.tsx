@@ -67,6 +67,7 @@ export default function OpenList({
   justWon,
   onToggle,
   onCloseOut,
+  onMove,
   onWho,
   onRemove,
   onBack,
@@ -76,6 +77,7 @@ export default function OpenList({
   justWon: string | null;
   onToggle: (id: string) => void;
   onCloseOut: (id: string, spent: number) => void;
+  onMove: (id: string, move: string) => void;
   onWho: (id: string, who: string) => void;
   onRemove: (id: string) => void;
   onBack: () => void;
@@ -140,6 +142,7 @@ export default function OpenList({
             justWon={justWon === it.id}
             onToggle={() => onToggle(it.id)}
             onCloseOut={(spent) => onCloseOut(it.id, spent)}
+            onMove={(move) => onMove(it.id, move)}
             onWho={(who) => onWho(it.id, who)}
             onRemove={() => onRemove(it.id)}
           />

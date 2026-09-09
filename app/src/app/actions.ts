@@ -34,6 +34,10 @@ export async function closeOutAction(id: string, spent: number) {
   return run(() => store.setSpent(id, spent));
 }
 
+export async function setMoveAction(id: string, move: string) {
+  return run(() => store.setMove(id, move));
+}
+
 export async function setWhoAction(id: string, who: string) {
   return run(() => store.setWho(id, who));
 }

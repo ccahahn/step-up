@@ -13,6 +13,7 @@ export default function Row({
   justWon,
   onToggle,
   onCloseOut,
+  onMove,
   onWho,
   onRemove,
 }: {
@@ -21,6 +22,7 @@ export default function Row({
   justWon: boolean;
   onToggle: () => void;
   onCloseOut: (spent: number) => void;
+  onMove: (move: string) => void;
   onWho: (who: string) => void;
   onRemove: () => void;
 }) {
@@ -29,6 +31,7 @@ export default function Row({
 
   const [spent, setSpent] = useState(shut ? m(item.spent!) : "");
   const [who, setWho] = useState<string[]>(parseWho(item.who ?? ""));
+  const [move, setMove] = useState(item.move ?? "");
   const spentRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -97,6 +100,20 @@ export default function Row({
                 placeholder="$0"
                 value={spent}
                 onValueChange={setSpent}
+              />
+            </div>
+
+            <div>
+              <label htmlFor={`m-${item.id}`}>Instead, I could&hellip;</label>
+              <input
+                id={`m-${item.id}`}
+                type="text"
+                placeholder="buy a pint and sugar cones"
+                value={move}
+                onChange={(e) => {
+                  setMove(e.target.value);
+                  onMove(e.target.value);
+                }}
               />
             </div>
 

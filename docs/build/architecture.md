@@ -112,6 +112,16 @@ from under someone is worse than a stale write. The banner covers it.
 
 ## Installed, not bookmarked
 
+Android only builds a real installed app — a WebAPK — for a site with a service
+worker that has a fetch handler. Without one, Add to Home Screen makes a plain
+bookmark shortcut, and a shortcut is drawn on Chrome's own white plate with the
+manifest's maskable icon ignored. `public/sw.js` exists for that reason alone.
+It caches nothing: the list is shared and must never be served stale, so the
+worker only handles navigations and answers with a plain offline page when the
+network is gone. Chrome also wants a 192 alongside the 512 before it considers
+the app installable, so `make-icons.py` emits both.
+
+
 `layout.tsx` declares `viewport-fit=cover`, `apple-mobile-web-app-capable`, and
 a translucent status bar, so Add to Home Screen launches without browser
 chrome. That removes the chrome that was insetting the content, so `.wrap`

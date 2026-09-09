@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Instrument_Sans } from "next/font/google";
+import RegisterSW from "@/components/RegisterSW";
 import "./globals.css";
 
 const sans = Instrument_Sans({
@@ -37,6 +38,7 @@ export default function RootLayout({
     <html lang="en" className={sans.className}>
       <body>
         <div className="wrap">{children}</div>
+        <RegisterSW />
       </body>
     </html>
   );

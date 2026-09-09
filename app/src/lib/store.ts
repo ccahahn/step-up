@@ -105,6 +105,18 @@ export async function setSpent(id: string, spent: number): Promise<void> {
   await sql`update items set spent = ${spent} where id = ${id}`;
 }
 
+export async function setMove(id: string, move: string): Promise<void> {
+  if (!usingDatabase) {
+    assertLocalAllowed();
+    const rows = await readLocal();
+    const row = rows.find((r) => r.id === id);
+    if (row) row.move = move;
+    return writeLocal(rows);
+  }
+  const sql = db();
+  await sql`update items set move = ${move} where id = ${id}`;
+}
+
 export async function setWho(id: string, who: string): Promise<void> {
   if (!usingDatabase) {
     assertLocalAllowed();

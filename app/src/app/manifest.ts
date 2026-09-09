@@ -17,7 +17,9 @@ export default function manifest(): MetadataRoute.Manifest {
       // lets the launcher crop our own black field to whatever shape it uses.
       // The art already suits both — full-bleed black, lotus well inside the
       // centre 80% safe zone.
+      { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
       { src: "/icon.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
       { src: "/icon.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
   };

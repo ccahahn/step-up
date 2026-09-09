@@ -9,6 +9,7 @@ import {
   closeOutAction,
   refreshAction,
   removeItemAction,
+  setMoveAction,
   setWhoAction,
 } from "@/app/actions";
 import type { Result } from "@/app/actions";
@@ -35,8 +36,9 @@ export default function StepUp({
   // the pre-write rows and undo what you just did on screen.
   const inFlight = useRef(0);
 
-  // One debounce timer per row, so two people's names do not cancel each other.
-  const whoTimers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
+  // One debounce timer per field per row, so editing two things at once — or
+  // two rows — does not cancel either.
+  const liveTimers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
 
   const go = (v: View) => {
     if (v !== "open") setOpened(null);
@@ -121,28 +123,48 @@ export default function StepUp({
     }
   }
 
-  // Typed a character at a time, so paint every keystroke and let the write
-  // settle. No rollback here on purpose — losing a half-typed name to a failed
-  // request would yank the field out from under the person typing it; the
-  // banner tells them instead.
+  /**
+   * Edited a character or a tap at a time: paint every change and let the write
+   * settle behind it. No rollback here on purpose — yanking half-typed text out
+   * from under someone is worse than a stale write, and the banner covers it.
+   */
+  const liveEdit = useCallback(
+    (key: string, apply: (cur: Item[]) => Item[], write: () => Promise<Result>) => {
+      setItems(apply);
+
+      const timers = liveTimers.current;
+      if (timers.has(key)) clearTimeout(timers.get(key)!);
+      else inFlight.current += 1; // held until this field's write lands
+
+      timers.set(
+        key,
+        setTimeout(() => {
+          timers.delete(key);
+          write()
+            .then((r) => setProblem(r.ok ? null : r.error))
+            .catch((e) => setProblem(e instanceof Error ? e.message : String(e)))
+            .finally(() => {
+              inFlight.current -= 1;
+            });
+        }, 500),
+      );
+    },
+    [],
+  );
+
   function setWho(id: string, who: string) {
-    setItems((cur) => cur.map((i) => (i.id === id ? { ...i, who } : i)));
+    liveEdit(
+      `who:${id}`,
+      (cur) => cur.map((i) => (i.id === id ? { ...i, who } : i)),
+      () => setWhoAction(id, who),
+    );
+  }
 
-    const timers = whoTimers.current;
-    if (timers.has(id)) clearTimeout(timers.get(id)!);
-    else inFlight.current += 1; // held until this id's write lands
-
-    timers.set(
-      id,
-      setTimeout(() => {
-        timers.delete(id);
-        setWhoAction(id, who)
-          .then((r) => setProblem(r.ok ? null : r.error))
-          .catch((e) => setProblem(e instanceof Error ? e.message : String(e)))
-          .finally(() => {
-            inFlight.current -= 1;
-          });
-      }, 500),
+  function setMove(id: string, move: string) {
+    liveEdit(
+      `move:${id}`,
+      (cur) => cur.map((i) => (i.id === id ? { ...i, move } : i)),
+      () => setMoveAction(id, move),
     );
   }
 
@@ -183,6 +205,7 @@ export default function StepUp({
           justWon={justWon}
           onToggle={(id) => setOpened((cur) => (cur === id ? null : id))}
           onCloseOut={closeOut}
+          onMove={setMove}
           onWho={setWho}
           onRemove={remove}
           onBack={() => go("home")}
